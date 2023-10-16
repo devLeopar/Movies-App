@@ -1,15 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
+import { Movie } from "../types/Movie";
 import { RCFC } from "../globalTypes";
 
-interface Movie {
-  Title: string;
-  Year: string;
-  // ... other movie properties
-}
-
 interface MovieContextProps {
-  title: string | null;
-  setTitle: (title: string) => void;
   movies: Movie[] | null;
   setMovies: (movies: Movie[]) => void;
 }
@@ -25,19 +18,15 @@ export const useMovieContext = () => {
 };
 
 export const MovieProvider: RCFC = ({ children }) => {
-  const [title, setTitleState] = useState<string | null>(null);
   const [movies, setMoviesState] = useState<Movie[] | null>(null);
 
-  const setTitle = (title: string) => {
-    setTitleState(title);
-  };
-
-  const setMovies = (movies: Movie[]) => {
-    setMoviesState(movies);
-  };
-
   return (
-    <MovieContext.Provider value={{ title, setTitle, movies, setMovies }}>
+    <MovieContext.Provider
+      value={{
+        movies,
+        setMovies: setMoviesState,
+      }}
+    >
       {children}
     </MovieContext.Provider>
   );

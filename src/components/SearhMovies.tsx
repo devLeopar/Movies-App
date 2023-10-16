@@ -28,16 +28,28 @@ const SearchMovies: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Search for a Movie</h1>
-      <input
-        type="text"
-        value={titleInput}
-        onChange={(e) => setTitleInput(e.target.value)}
-      />
-      <button onClick={handleSearch} disabled={titleInput === ""}>
-        Search
-      </button>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl mb-4 font-bold">Search for a Movie</h1>
+      <div className="flex items-center justify-center space-x-4">
+        <input
+          type="text"
+          value={titleInput}
+          onChange={(e) => setTitleInput(e.target.value)}
+          className="p-2 w-64 border rounded-md focus:ring focus:ring-indigo-200 focus:border-indigo-300"
+          placeholder="Enter movie title..."
+        />
+        <button
+          onClick={handleSearch}
+          disabled={titleInput === ""}
+          className={`px-4 py-2 rounded-md bg-indigo-600 text-white ${
+            titleInput === ""
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-indigo-700"
+          }`}
+        >
+          Search
+        </button>
+      </div>
 
       {error && <p>Error: {error.message}</p>}
       {isLoading && <p>Loading...</p>}

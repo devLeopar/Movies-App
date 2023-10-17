@@ -3,6 +3,7 @@ import { useMovieContext } from "../context/MovieContext";
 import { useQuery } from "react-query";
 import { searchMoviesByTitle } from "../api/movies";
 import { Movie } from "../types/Movie";
+import MovieCard from "./MovieCard";
 
 const SearchMovies: React.FC = () => {
   const { movies, setMovies } = useMovieContext();
@@ -54,13 +55,9 @@ const SearchMovies: React.FC = () => {
       {error && <p>Error: {error.message}</p>}
       {isLoading && <p>Loading...</p>}
       {movies && (
-        <div>
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {movies.map((movie) => (
-            <div key={movie.imdbID}>
-              <h2>
-                {movie.Title} ({movie.Year})
-              </h2>
-            </div>
+            <MovieCard key={movie.imdbID} movie={movie} />
           ))}
         </div>
       )}

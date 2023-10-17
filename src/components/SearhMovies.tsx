@@ -4,11 +4,17 @@ import { useQuery } from "react-query";
 import { searchMoviesByTitle } from "../api/movies";
 import { Movie } from "../types/Movie";
 import MovieCard from "./MovieCard";
+import MovieGroupWorkerWrapper from "../workers/MovieGroupWorkerWrapper";
+import { workerScript } from "../workers/BlobMovieGroupWorkerWrapper";
 
 const SearchMovies: React.FC = () => {
   const { movies, setMovies } = useMovieContext();
   const [titleInput, setTitleInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [groupedMovies, setGroupedMovies] = useState<{
+    [year: string]: Movie[];
+  }>({});
 
   const { data, error, isLoading } = useQuery<Movie[], Error>(
     ["searchMovie", searchTerm],
@@ -17,6 +23,26 @@ const SearchMovies: React.FC = () => {
       enabled: searchTerm !== "",
     }
   );
+
+  useEffect(() => {
+    if (movies && Array.isArray(movies)) {
+      const handleWorkerMessage = (e: MessageEvent) => {
+        setGroupedMovies(e.data);
+      };
+
+      const worker = new MovieGroupWorkerWrapper(
+        workerScript,
+        handleWorkerMessage
+      );
+
+      worker.postMessage(movies);
+
+      // Cleanup the worker when the component unmounts
+      return () => {
+        worker.terminate();
+      };
+    }
+  }, [movies]);
 
   useEffect(() => {
     if (data) {
@@ -54,10 +80,15 @@ const SearchMovies: React.FC = () => {
 
       {error && <p>Error: {error.message}</p>}
       {isLoading && <p>Loading...</p>}
-      {movies && (
+      {Object.keys(groupedMovies).length > 0 && (
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {movies.map((movie) => (
-            <MovieCard key={movie.imdbID} movie={movie} />
+          {Object.entries(groupedMovies).map(([year, movies]) => (
+            <React.Fragment key={year}>
+              <h2 className="col-span-full text-2xl mt-4">{year}</h2>
+              {movies.map((movie) => (
+                <MovieCard key={movie.imdbID} movie={movie} />
+              ))}
+            </React.Fragment>
           ))}
         </div>
       )}

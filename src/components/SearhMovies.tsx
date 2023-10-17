@@ -21,6 +21,8 @@ const SearchMovies: React.FC = () => {
     () => searchMoviesByTitle(searchTerm as string),
     {
       enabled: searchTerm !== "",
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   );
 
